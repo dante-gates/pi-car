@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+<script>
+$(document).ready(function(){
+    $("body").keydown(function(){
+        $("body").css("background-color", "yellow");
+    });
+    $("body").keyup(function(){
+        $("body").css("background-color", "pink");
+    });
+});
+</script>
+{% endblock %}

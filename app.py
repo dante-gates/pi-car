@@ -1,14 +1,19 @@
-from .gpio import Channel
-from flask import Flask, request, has_request_context
+#from .gpio import Channel
+from flask import Flask, request, has_request_context, render_template
 
 
 app = Flask(__name__)
 
 
-@app.route('/pilot')
+@app.route('/')
+def root():
+    return render_template('client.html')
+
+
+@app.route('/_drive')
 def pilot():
     if has_request_context():
-        movement = request.get('d')
+        movement = request.get('d', None)  # None for testing
         with Channel(11) as ch:
             ch.strobe(10, 0.05)
     else:
@@ -16,4 +21,4 @@ def pilot():
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 9999)
+    app.run()
