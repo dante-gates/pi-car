@@ -1,13 +1,20 @@
 {% extends "layout.html" %}
 {% block body %}
-<script>
-$(document).ready(function(){
-    $("body").keydown(function(){
-        $("body").css("background-color", "yellow");
-    });
-    $("body").keyup(function(){
-        $("body").css("background-color", "pink");
-    });
-});
+<script type="text/javascript">
+  $(function() {
+    var submit_form = function(e) {
+      $.getJSON($SCRIPT_ROOT + '_drive', {
+        d: 'f'
+      }, function(data) {
+        console.log('calling sumbit_form');
+        $('#result').text(data.result);
+      });
+    return false;
+  };
+
+  $('body').bind('keydown', submit_form);
+  }).ready();
+    
 </script>
+<span id="result"></span>
 {% endblock %}
