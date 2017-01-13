@@ -1,6 +1,6 @@
 from flask import Flask, request, has_request_context, render_template
 
-from car import Car
+from .car import Car
 
 
 app = Flask(__name__)
@@ -22,6 +22,6 @@ def pilot():
         return 'foo', 200  # TODO: what to return here?
 
 
-
 if __name__ == '__main__':
+#    app.run('0.0.0.0', 9999)
     app.run()
