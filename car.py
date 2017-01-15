@@ -5,8 +5,9 @@ class _Machinery:
     def __init__(self, channel, *args, **kwargs):
         self._channel = channel
 
-    def move(self, *args, **kwargs):
-        self._channel.output(*args, **kwargs)
+    def move(self):
+        with Channel(self._channel) as ch:
+            ch.output(1)
 
 class Car:
     _forward = _Machinery(11)
@@ -16,4 +17,4 @@ class Car:
             self._drive_forward()
 
     def _drive_forward(self):
-        self.forward.move(1)
+        self._forward.move()
