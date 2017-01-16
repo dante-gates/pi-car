@@ -1,5 +1,10 @@
 import time
-import RPi.GPIO as GPIO
+from importlib.util import find_spec as _find_spec
+
+if _find_spec('RPi') is not None:
+    import RPi.GPIO as GPIO
+else:
+    from .utils import gpiostandin as GPIO
 
 
 class Channel:
