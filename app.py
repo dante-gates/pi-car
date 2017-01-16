@@ -22,7 +22,21 @@ def pilot():
         return 'foo', 200  # TODO: what to return here?
 
 
+@app.route('/_movement')
+def _movement():
+    return car.movement, 203
+
+
 if __name__ == '__main__':
-    app.run('0.0.0.0', 9999)
-    app.run()
+    import sys
+    try:
+        debug = sys.argv[1]
+    except IndexError:
+        debug = False
+    if debug:
+        app.debug=True
+        app.run()
+    else:
+        app.run('0.0.0.0', 9999)
+        app.run()
 

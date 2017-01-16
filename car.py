@@ -10,11 +10,13 @@ class _Machinery:
             ch.output(1)
 
 class Car:
+    movement = 'stopped'
     _forward = _Machinery(11)
 
     def drive(self, direction):
         if direction == 'forward':
             self._drive_forward()
+
 
     def _drive_forward(self):
         self._forward.move()
