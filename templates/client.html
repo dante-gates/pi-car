@@ -43,6 +43,8 @@
           command = 'right'
         } else if (keynum == 40) { //down
           command = 'backward'
+        } else {
+          return false;
         }
 
         $.getJSON($SCRIPT_ROOT + '_drive', {
