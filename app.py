@@ -1,14 +1,18 @@
 # http://html5doctor.com/server-sent-events/
 # https://mike.depalatis.net/flask-and-server-sent-events.html
 
+import time
 
 from flask import Flask, request, has_request_context, render_template, Response
 
-from .car import Car
+from car import Car
+from utils import MovementObserver
 
 
 app = Flask(__name__)
-car = Car()
+
+observer = MovementObserver()
+car = Car(observers=[observer])
 
 
 @app.route('/')
@@ -26,33 +30,22 @@ def pilot():
         return 'foo', 200  # TODO: what to return here?
 
 
-def _movement_stream():
-    prev = car.movement
+def _movement_stream(observer):
     while True:
-        cur = car.movement
-        if not cur == prev:
-            yield 'data: {"movement": "%s"}\n\n' % cur
+        time.sleep(.1)
+        if observer.movements:
+            yield 'data: {"movement": "%s"}\n\n' % observer.movements.pop()
 
 
 @app.route('/_movement')
 def _movement():
-    resp = Response(_movement_stream(), mimetype='text/event-stream')
+    global observer
+    resp = Response(_movement_stream(observer), mimetype='text/event-stream')
     return resp
 
 
 if __name__ == '__main__':
     import logging
-    import sys
-    logging.getLogger().setLevel('DEBUG')
-    logging.basicConfig()
-    try:
-        debug = sys.argv[1]
-    except IndexError:
-        debug = False
-    if debug:
-        app.debug=True
-        app.run()
-    else:
-        app.run('0.0.0.0', 9999)
-        app.run(threaded=True)
-
+    logging.basicConfig(level='DEBUG')
+    app.run('0.0.0.0', 9999)
+    app.run(threaded=True)
