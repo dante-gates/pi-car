@@ -2,21 +2,27 @@
 {% block body %}
 <script type="text/javascript">
 
+    var _LEFT = "{{ movements.left }}";
+    var _RIGHT = "{{ movements.right }}";
+    var _FORWARD = "{{ movements.forward }}";
+    var _BACKWORD = "{{ movements.backward }}";
+    var _STOP = "{{ movements.stop }}";
+
     var movementHandler = function(movement) {
 
         console.log('handling movement ' + movement)
 
         var updateMovement = function(movement) {
             console.log('updating arrow to ' + movement)
-            if (movement == "left") {
+            if (movement == _LEFT) {
                 document.getElementById("direction").src = "{{ url_for('static',filename='left.png') }}";
-            } else if (movement == "forward") {
+            } else if (movement == _FORWARD) {
                 document.getElementById("direction").src = "{{ url_for('static', filename='forward.png') }}";
-            } else if (movement == "right") {
+            } else if (movement == _RIGHT) {
                 document.getElementById("direction").src = "{{ url_for('static', filename='right.png') }}";
-            } else if (movement == "backward") {
+            } else if (movement == _BACKWORD) {
                 document.getElementById("direction").src = "{{ url_for('static', filename='backward.png') }}";
-            } else if (movement == "stop") {
+            } else if (movement == _STOP) {
                 document.getElementById("direction").src = "{{ url_for('static', filename='stopped.png') }}";    
             }
 
@@ -47,13 +53,13 @@
             console.log(keynum)
 
             if (keynum == 37) { // left
-                movement = 'left'
+                movement = _LEFT
             } else if (keynum == 38) { // up
-                movement = 'forward'
+                movement = _FORWARD
             } else if (keynum == 39) { //right
-                movement = 'right'
+                movement = _RIGHT
             } else if (keynum == 40) { //down
-                movement = 'backward'
+                movement = _BACKWORD
             } else {
                 return false;
             }
@@ -65,7 +71,7 @@
 
         var reset = function(e) {
             console.log('resetting')
-            movementHandler("stop")
+            movementHandler(_STOP)
         }
 
         $('body').bind('keydown', submitCommand);

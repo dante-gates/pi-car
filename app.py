@@ -6,7 +6,8 @@ import time
 from flask import Flask, request, has_request_context, render_template, Response
 
 from car import Car
-from utils import Observer, Logging
+import constants as cn
+from utils import Logging
 
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ _logger = Logging.get_logger(__name__)
 
 @app.route('/')
 def root():
-    return render_template('client.html')
+    return render_template('client.html', movements=cn.Movements)
 
 
 @app.route('/drive')
