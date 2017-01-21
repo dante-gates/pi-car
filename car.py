@@ -1,4 +1,5 @@
 import logging
+import time
 
 from constants import Movements as mv
 from gpio import Channel
@@ -12,6 +13,7 @@ class _Machinery:
     def move(self):
         with Channel(self._channel) as ch:
             ch.output(1)
+            time.sleep(.005)
 
 
 class Car:
