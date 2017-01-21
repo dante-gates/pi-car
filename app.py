@@ -5,19 +5,16 @@ import time
 
 from flask import Flask, request, has_request_context, render_template, Response
 import gevent
-from gevent.queue import Queue
 from gevent.wsgi import WSGIServer
 
 from car import Car
-from utils import Observer
+from utils import Observer, Logging
 
 
 app = Flask(__name__)
 car = Car()
 
-import logging
-
-_logger = logging.getLogger(__name__)
+_logger = Logging.get_logger(__name__)
 
 
 @app.route('/')
@@ -46,9 +43,9 @@ def subscribe_movement():
             while True:
                 _logger.debug('waiting to get movement...')
                 res = obs.get()
-                _logger.debug('got movement: %s' % res)
+                _logger.debug('got movement %s' % res)
                 yield 'data: %s\n\n' % res
-                _logger.debug('sent movement to client: %s' % res)
+                _logger.debug('sent movement %s to client %s' % res)
         except GeneratorExit:
             pass
 
@@ -56,7 +53,5 @@ def subscribe_movement():
 
 
 if __name__ == '__main__':
-    import logging
-    logging.basicConfig(level='DEBUG')
     server = WSGIServer(('localhost', 9999), app)
     server.serve_forever()

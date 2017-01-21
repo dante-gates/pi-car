@@ -1,6 +1,7 @@
 import logging
 
 from gpio import Channel
+from utils import Logging
 
 
 class _Machinery:
@@ -14,7 +15,7 @@ class _Machinery:
 
 class Car:
     _forward = _Machinery(11)
-    _logger = logging.getLogger(__name__)
+    _logger = Logging.get_logger(__name__)
 
     def __init__(self, observers=[]):
         self._observers = observers
