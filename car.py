@@ -11,6 +11,7 @@ class _Machinery:
         with Channel(self._channel) as ch:
             ch.output(1)
 
+
 class Car:
     _forward = _Machinery(11)
     _logger = logging.getLogger(__name__)
@@ -26,6 +27,9 @@ class Car:
             self._drive_forward()
         self.movement = 'stopped'
 
+    def add_observer(self, observer):
+        self._observers.append(observer)
+
     def _drive_forward(self):
         self._forward.move()
 
@@ -37,4 +41,4 @@ class Car:
     def movement(self, val):
         self._movement = val
         for obs in self._observers:
-            obs.recieve_signal(self._movement)
+            obs.receive(self._movement)

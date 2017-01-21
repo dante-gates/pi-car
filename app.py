@@ -4,15 +4,20 @@
 import time
 
 from flask import Flask, request, has_request_context, render_template, Response
+import gevent
+from gevent.queue import Queue
+from gevent.wsgi import WSGIServer
 
 from car import Car
-from utils import MovementObserver
+from utils import Observer
 
 
 app = Flask(__name__)
+car = Car()
 
-observer = MovementObserver()
-car = Car(observers=[observer])
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 @app.route('/')
@@ -20,32 +25,38 @@ def root():
     return render_template('client.html')
 
 
-@app.route('/_drive')
+@app.route('/drive')
 def pilot():
     if has_request_context():
-        movement = request.args.get('direction', None)  # None for testing
+        movement = request.args.get('direction', None)
+        _logger.debug('request to drive: %s' % movement)
         car.drive(movement)
         return 'received', 200
     else:
         return 'foo', 200  # TODO: what to return here?
 
 
-def _movement_stream(observer):
-    while True:
-        time.sleep(.1)
-        if observer.movements:
-            yield 'data: {"movement": "%s"}\n\n' % observer.movements.pop()
+@app.route('/subscribe/movement')
+def subscribe_movement():
+    _logger.debug('subscribing to movements')
+    def stream():
+        obs = Observer()
+        car.add_observer(obs)
+        try:
+            while True:
+                _logger.debug('waiting to get movement...')
+                res = obs.get()
+                _logger.debug('got movement: %s' % res)
+                yield 'data: %s\n\n' % res
+                _logger.debug('sent movement to client: %s' % res)
+        except GeneratorExit:
+            pass
 
-
-@app.route('/_movement')
-def _movement():
-    global observer
-    resp = Response(_movement_stream(observer), mimetype='text/event-stream')
-    return resp
+    return Response(stream(), mimetype='text/event-stream')
 
 
 if __name__ == '__main__':
     import logging
     logging.basicConfig(level='DEBUG')
-    app.run('0.0.0.0', 9999)
-    app.run(threaded=True)
+    server = WSGIServer(('localhost', 9999), app)
+    server.serve_forever()
