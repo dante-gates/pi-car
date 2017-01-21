@@ -1,5 +1,6 @@
 import logging
 
+from constants import Movements as mv
 from gpio import Channel
 from utils import Logging
 
@@ -19,14 +20,14 @@ class Car:
 
     def __init__(self, observers=[]):
         self._observers = observers
-        self.movement = 'stopped'
+        self.movement = mv.stop
 
     def drive(self, direction):
         self.movement = direction
         self._logger.debug(self.movement)
-        if direction == 'forward':
+        if direction == mv.forward:
             self._drive_forward()
-        self.movement = 'stopped'
+        self.movement = mv.stop
 
     def add_observer(self, observer):
         self._observers.append(observer)
