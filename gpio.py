@@ -1,9 +1,10 @@
 import time
-import RPi.GPIO as GPIO
+from importlib.util import find_spec as _find_spec
 
-
-# with Channel(11) as channel:
-#     channel.strobe(10, .05)
+if _find_spec('RPi') is not None:
+    import RPi.GPIO as GPIO
+else:
+    from _dev import gpiostandin as GPIO
 
 
 class Channel:
@@ -12,14 +13,14 @@ class Channel:
         self._channel = channel
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(channel, GPIO.OUT, *args, **kwargs)
-        
+
     def __enter__(self):
         return self
 
     def __exit__(self, ex_val, ex_ty, ex_tb):
         self.output(0)
         GPIO.cleanup(self._channel)
-        
+
     def output(self, state):
         GPIO.output(self._channel, state)
 
