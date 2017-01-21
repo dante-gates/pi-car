@@ -1,59 +1,76 @@
 {% extends "layout.html" %}
 {% block body %}
 <script type="text/javascript">
-    function updateMovement(movement) {
-        if (movement == "left") {
-            document.getElementById("direction").src = "{{ url_for('static',filename='left.png') }}";
-        } else if (movement == "forward") {
-            document.getElementById("direction").src = "{{ url_for('static', filename='forward.png') }}";
-        } else if (movement == "right") {
-            document.getElementById("direction").src = "{{ url_for('static', filename='right.png') }}";
-        } else if (movement == "backward") {
-            document.getElementById("direction").src = "{{ url_for('static', filename='backward.png') }}";
-        // } else if (movement == "stopped") {
-        //     document.getElementById("direction").src = "{{ url_for('static', filename='stopped.png') }}";
-        }
-    };
 
+    var movementHandler = function(movement) {
 
-    $(function() {
-        var source = new EventSource('/subscribe/movement');
+        console.log('handling movement ' + movement)
 
-        source.addEventListener('message',
-            function(e) {
-                var data = e.data;
-                console.log('movement ' + data)
-                updateMovement(data)
-            },
-            false
-        );
-
-        var submitCommand = function(e) {
-            keynum = e.keyCode;
-
-            if (keynum == 37) { // left
-                command = 'left'
-            } else if (keynum == 38) { // up
-                command = 'forward'
-            } else if (keynum == 39) { //right
-                command = 'right'
-            } else if (keynum == 40) { //down
-                command = 'backward'
-            } else {
-                return false;
+        var updateMovement = function(movement) {
+            console.log('updating arrow to ' + movement)
+            if (movement == "left") {
+                document.getElementById("direction").src = "{{ url_for('static',filename='left.png') }}";
+            } else if (movement == "forward") {
+                document.getElementById("direction").src = "{{ url_for('static', filename='forward.png') }}";
+            } else if (movement == "right") {
+                document.getElementById("direction").src = "{{ url_for('static', filename='right.png') }}";
+            } else if (movement == "backward") {
+                document.getElementById("direction").src = "{{ url_for('static', filename='backward.png') }}";
+            } else if (movement == "stop") {
+                document.getElementById("direction").src = "{{ url_for('static', filename='stopped.png') }}";    
             }
-
-            console.log('command ' + command)
-            $.getJSON($SCRIPT_ROOT + 'drive', {
-                direction: command
-            }, function(data) {
-                $('#result').text(data.result);
-            });
 
             return false;
         };
 
+        var sendMovement = function(movement) {
+            console.log('sending movement ' + movement)
+            $.getJSON(
+                $SCRIPT_ROOT + 'drive',
+                {direction: movement},
+                function(data) {
+                    $('#result').text(data.result);
+                });
+
+            return false;
+        };
+
+        updateMovement(movement);
+        sendMovement(movement);
+    };
+
+
+    $(function() {
+
+        var submitCommand = function(e) {
+            var keynum = e.keyCode;
+            console.log(keynum)
+
+            if (keynum == 37) { // left
+                movement = 'left'
+            } else if (keynum == 38) { // up
+                movement = 'forward'
+            } else if (keynum == 39) { //right
+                movement = 'right'
+            } else if (keynum == 40) { //down
+                movement = 'backward'
+            } else {
+                return false;
+            }
+
+            movementHandler(movement);
+
+            return false;
+        };
+
+        var reset = function(e) {
+            console.log('resetting')
+            movementHandler("stop")
+        }
+
         $('body').bind('keydown', submitCommand);
+        $('body').bind('keyup', reset)
+
     }).ready();
     
 </script>

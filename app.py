@@ -4,8 +4,6 @@
 import time
 
 from flask import Flask, request, has_request_context, render_template, Response
-import gevent
-from gevent.wsgi import WSGIServer
 
 from car import Car
 from utils import Observer, Logging
@@ -33,25 +31,5 @@ def pilot():
         return 'foo', 200  # TODO: what to return here?
 
 
-@app.route('/subscribe/movement')
-def subscribe_movement():
-    _logger.debug('subscribing to movements')
-    def stream():
-        obs = Observer()
-        car.add_observer(obs)
-        try:
-            while True:
-                _logger.debug('waiting to get movement...')
-                res = obs.get()
-                _logger.debug('got movement %s' % res)
-                yield 'data: %s\n\n' % res
-                _logger.debug('sent movement %s to client %s' % res)
-        except GeneratorExit:
-            pass
-
-    return Response(stream(), mimetype='text/event-stream')
-
-
 if __name__ == '__main__':
-    server = WSGIServer(('localhost', 9999), app)
-    server.serve_forever()
+    app.run()
