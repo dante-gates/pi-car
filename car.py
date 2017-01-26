@@ -2,8 +2,8 @@ import logging
 import time
 
 from constants import Movements as mv
-from gpio import Channel
-from utils import Logging
+from utils.gpio import Channel
+from utils.log import Logging
 
 
 class _Machinery:

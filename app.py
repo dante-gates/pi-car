@@ -7,7 +7,7 @@ from flask import Flask, request, has_request_context, render_template, Response
 
 from car import Car
 import constants as cn
-from utils import Logging
+from utils.log import Logging
 
 
 app = Flask(__name__)
