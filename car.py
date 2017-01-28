@@ -1,7 +1,10 @@
 import logging
 import time
+from threading import Thread
+from queue import Queue
 
 from constants import Movements as mv
+from utils.concurrency import Sentinel
 from utils.gpio import Channel
 from utils.log import Logging
 
@@ -16,6 +19,10 @@ class _Machinery:
             time.sleep(.005)
 
 
+Shutdown = Sentinel('Shutdown')
+
+
+# TODO: make car singleton
 class Car:
     _forward = _Machinery(11)
     _logger = Logging.get_logger(__name__)
@@ -23,10 +30,29 @@ class Car:
     def __init__(self, observers=[]):
         self._observers = observers
         self.movement = mv.stop
+        self._commands = Queue()
 
-    def drive(self, direction):
+    def start(self):
+        def run(instance):
+            while True:
+                command = instance._commands.get()
+                instance._logger.debug('Got command %s' % command)
+                if command is Shutdown:
+                    instance._logger.info('Shutting down')
+                    break
+                else:
+                    instance._drive(command)
+        t = Thread(target=run, args=(self,))
+        t.start()
+
+    def add_command(self, command):
+        if command == 'shutdown':
+            command = Shutdown
+        self._commands.put(command)
+
+    def _drive(self, direction):
         self.movement = direction
-        self._logger.debug(self.movement)
+        self._logger.debug('Moving ' + self.movement)
         if direction == mv.forward:
             self._drive_forward()
         self.movement = mv.stop
