@@ -12,6 +12,7 @@ from utils.log import Logging
 
 app = Flask(__name__)
 car = Car()
+car.start()
 
 _logger = Logging.get_logger(__name__)
 
@@ -26,7 +27,7 @@ def pilot():
     if has_request_context():
         movement = request.args.get('direction', None)
         _logger.debug('request to drive: %s' % movement)
-        car.drive(movement)
+        car.add_command(movement)
         return 'received', 200
     else:
         return 'foo', 200  # TODO: what to return here?
